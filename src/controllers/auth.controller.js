@@ -8,7 +8,7 @@ import { createAccessToken } from '../libs/jwt.js'; // Importa la función para 
 // Controlador para el registro de usuarios
 export const register = async (req, res) => {
   // Obtiene los datos del cuerpo de la solicitud
-  const { email, password, username } = req.body;
+  const { email, password, username, role } = req.body;
 
   try {
     // Genera un hash (valor hasheado) de la contraseña recibida
@@ -19,6 +19,7 @@ export const register = async (req, res) => {
       username,
       email,
       password: passwordHash,
+      role,
     });
 
     // Guarda el nuevo usuario en la base de datos
@@ -33,6 +34,7 @@ export const register = async (req, res) => {
       id: userSaved.id,
       username: userSaved.username,
       email: userSaved.email,
+      role: userSaved.role,
       createdAt: userSaved.createdAt,
       updatedAt: userSaved.updatedAt,
     });
@@ -71,6 +73,7 @@ export const login = async (req, res) => {
       id: userFound.id,
       username: userFound.username,
       email: userFound.email,
+      role: userFound.role,
       createdAt: userFound.createdAt,
       updatedAt: userFound.updatedAt,
     });
@@ -104,6 +107,7 @@ export const profile = async (req, res) => {
       id: userFound._id,
       username: userFound.username,
       email: userFound.email,
+      role: userFound.role,
       createdAt: userFound.createdAt,
       updatedAt: userFound.updatedAt,
     });

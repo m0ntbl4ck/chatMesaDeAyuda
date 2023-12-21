@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema(
       type: String, // Tipo de dato: String para la contraseña
       required: true, // Campo obligatorio
     },
+    role: {
+      type: String, // Tipo de dato: String para la contraseña
+      required: true, // Campo obligatorio
+    },
   },
   {
     timestamps: true, // Habilita la creación automática de campos 'createdAt' y 'updatedAt'

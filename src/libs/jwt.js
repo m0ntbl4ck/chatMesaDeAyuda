@@ -1,8 +1,12 @@
 // Importación del módulo jwt para la generación de tokens JWT (JSON Web Tokens)
 import jwt from 'jsonwebtoken'; // Importa la librería 'jsonwebtoken'
+import dotenv from 'dotenv';
 
-// Importación de TOKEN_SECRET desde el archivo de configuración
-import { TOKEN_SECRET } from '../config.js'; // Importa la constante TOKEN_SECRET desde un archivo de configuración
+dotenv.config();
+
+//import { TOKEN_SECRET } from '../config.js'; // Importa la constante TOKEN_SECRET desde un archivo de configuración
+
+const token_secret = process.env.TOKEN_SECRET;
 
 // Función para crear un token de acceso (Access Token) basado en un payload proporcionado
 export function createAccessToken(payload) {
@@ -10,9 +14,9 @@ export function createAccessToken(payload) {
     // Generación de un token JWT
     jwt.sign(
       payload, // Información a incluir en el token (payload)
-      TOKEN_SECRET, // Clave secreta para la firma del token
+      token_secret, // Clave secreta para la firma del token
       {
-        expiresIn: '5m', // Define la expiración del token (en este caso, 5 minutos)
+        expiresIn: '20m', // Define la expiración del token (en este caso, 20 minutos)
       },
       (err, token) => {
         if (err) reject(err); // Si hay un error durante la generación del token, se rechaza la promesa con el error
