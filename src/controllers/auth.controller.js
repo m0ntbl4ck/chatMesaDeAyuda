@@ -1,4 +1,4 @@
-// Controlador para manejar los datos enviados en las peticiones 'register' y 'login'
+// Controlador para manejar los datos enviados en las peticiones 'register','login' y 'logout'
 
 // Importación del modelo de usuario, bcrypt para el hashing de contraseñas y la función para crear tokens JWT
 import User from '../models/user.model.js'; // Importa el modelo de usuario
@@ -87,4 +87,28 @@ export const logout = (req, res) => {
 
   // Envía un código de estado 200 (OK) indicando que el cierre de sesión fue exitoso
   return res.sendStatus(200);
+};
+
+// Controlador para obtener el perfil del usuario autenticado
+export const profile = async (req, res) => {
+  try {
+    // Busca al usuario en la base de datos usando el ID del usuario almacenado en req.user
+    const userFound = await User.findById(req.user.id);
+
+    // Si no se encuentra al usuario, devuelve un mensaje de error
+    if (!userFound)
+      return res.status(400).json({ message: 'Usuario no encontrado' });
+
+    // Si se encuentra al usuario, devuelve los detalles del perfil en formato JSON
+    return res.json({
+      id: userFound._id,
+      username: userFound.username,
+      email: userFound.email,
+      createdAt: userFound.createdAt,
+      updatedAt: userFound.updatedAt,
+    });
+  } catch (error) {
+    // Manejo de errores: En caso de error, envía un código de estado 500 y un mensaje de error en formato JSON
+    res.status(500).json({ message: error.message });
+  }
 };
