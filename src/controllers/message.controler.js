@@ -3,7 +3,7 @@
 // Importación del modelo de usuario, bcrypt para el hashing de contraseñas y la función para crear tokens JWT
 import Message from '../models/message.model.js';
 
-export const saveMessage = async (req, res) => {
+export const sendMessage = async (req, res) => {
   const { senderId, recipientId, message, status } = req.body;
 
   const timestamp = new Date();
