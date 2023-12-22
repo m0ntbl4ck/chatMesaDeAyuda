@@ -1,16 +1,24 @@
-// Controlador para manejar los datos enviados en las peticiones 'register','login' y 'logout'
+// Controlador para manejar los datos enviados en las peticiones 'register', 'login' y 'logout'
 
 // Importación del modelo de usuario, bcrypt para el hashing de contraseñas y la función para crear tokens JWT
 import User from '../models/user.model.js'; // Importa el modelo de usuario
 import bcrypt from 'bcryptjs'; // Importa bcrypt para el hashing de contraseñas
 import { createAccessToken } from '../libs/jwt.js'; // Importa la función para crear tokens de acceso JWT
+import jwt from 'jsonwebtoken';
+const token_secret = process.env.TOKEN_SECRET;
 
 // Controlador para el registro de usuarios
 export const register = async (req, res) => {
   // Obtiene los datos del cuerpo de la solicitud
-  const { email, password, username, role } = req.body;
+  const { email, password, username } = req.body;
 
   try {
+    const emailFound = await User.findOne({ email });
+    if (emailFound) return res.status(400).json(['el email ya está en uso']);
+
+    const userFound = await User.findOne({ username });
+    if (userFound) return res.status(400).json(['el usuario ya está en uso']);
+
     // Genera un hash (valor hasheado) de la contraseña recibida
     const passwordHash = await bcrypt.hash(password, 10);
 
@@ -19,7 +27,6 @@ export const register = async (req, res) => {
       username,
       email,
       password: passwordHash,
-      role,
     });
 
     // Guarda el nuevo usuario en la base de datos
@@ -34,7 +41,6 @@ export const register = async (req, res) => {
       id: userSaved.id,
       username: userSaved.username,
       email: userSaved.email,
-      role: userSaved.role,
       createdAt: userSaved.createdAt,
       updatedAt: userSaved.updatedAt,
     });
@@ -73,7 +79,6 @@ export const login = async (req, res) => {
       id: userFound.id,
       username: userFound.username,
       email: userFound.email,
-      role: userFound.role,
       createdAt: userFound.createdAt,
       updatedAt: userFound.updatedAt,
     });
@@ -107,7 +112,6 @@ export const profile = async (req, res) => {
       id: userFound._id,
       username: userFound.username,
       email: userFound.email,
-      role: userFound.role,
       createdAt: userFound.createdAt,
       updatedAt: userFound.updatedAt,
     });
@@ -115,4 +119,24 @@ export const profile = async (req, res) => {
     // Manejo de errores: En caso de error, envía un código de estado 500 y un mensaje de error en formato JSON
     res.status(500).json({ message: error.message });
   }
+};
+
+// Controlador para verificar el token y la autenticación del usuario
+export const verifyToken = async (req, res) => {
+  const { token } = req.cookies;
+
+  if (!token) return res.status(401).json({ message: 'No Autorizado' });
+
+  jwt.verify(token, token_secret, async (err, user) => {
+    if (err) return res.status(401).json({ message: 'No Autorizado' });
+
+    const userFound = await User.findById(user.id);
+    if (!userFound) return res.status(401).json({ message: 'No Autorizado' });
+
+    return res.json({
+      id: userFound._id,
+      username: userFound.username,
+      email: userFound.email,
+    });
+  });
 };
